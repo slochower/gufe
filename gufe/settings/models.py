@@ -122,6 +122,8 @@ class ThermoSettings(SettingsBaseModel):
     redox_potential: Optional[float] = Field(
         None, description="Simulation redox potential"
     )
+    membrane: bool = Field(False, description="Whether to simulate a membrane "
+        "system and use a MonteCarloMembraneBarostat.")
 
 
 class BaseForceFieldSettings(SettingsBaseModel, abc.ABC):
