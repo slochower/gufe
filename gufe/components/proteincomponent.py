@@ -6,11 +6,12 @@ import io
 import numpy as np
 from os import PathLike
 import string
-from typing import Union, Optional
+from typing import Union, Optional, override
 from collections import defaultdict
 
 from openmm import app
 from openmm import unit as omm_unit
+from openmm.unit import Quantity
 
 from rdkit import Chem
 from rdkit.Chem.rdchem import Mol, Atom, Conformer, EditableMol, BondType
@@ -546,3 +547,33 @@ class ProteinComponent(ExplicitMoleculeComponent):
         }
 
         return d
+
+class ProteinMembraneComponent(ProteinComponent):
+    def __init__(self, rdkit: RDKitMol, name: str = "", periodic_box_vectors:
+    Optional[Quantity] = None):
+        super().__init__(rdkit=rdkit, name=name)
+        self.periodic_box_vectors = periodic_box_vectors
+
+    @classmethod
+    @override
+    def from_pdb_file(cls, pdb_file: str, name: str = ""):
+        """
+        Create ``ProteinComponent`` from PDB-formatted file.
+
+        Parameters
+        ----------
+        pdb_file : str
+            path to the pdb file.
+        name : str, optional
+            name of the input protein, by default ""
+
+        Returns
+        -------
+        ProteinComponent
+            the deserialized molecule
+        """
+        openmm_PDBFile = PDBFile(pdb_file)
+        protein_component = super()._from_openmmPDBFile(openmm_PDBFile=openmm_PDBFile, name=name)
+
+        return cls(rdkit=protein_component.rdkit, name=protein_component.name,
+                   periodic_box_vectors=openmm_PDBFile.topology.getPeriodicBoxVectors())

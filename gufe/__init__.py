@@ -11,6 +11,7 @@ from .components import (
     Component,
     SmallMoleculeComponent,
     ProteinComponent,
+    ProteinMembraneComponent,
     SolventComponent
 )
 

@@ -6,7 +6,7 @@ import copy
 import pytest
 from rdkit import Chem
 
-from gufe import ProteinComponent
+from gufe import ProteinComponent, ProteinMembraneComponent
 
 from .test_tokenization import GufeTokenizableTestsMixin
 
@@ -294,6 +294,19 @@ class TestProteinComponent(GufeTokenizableTestsMixin):
 
         assert m1.total_charge == 6
 
+class TestProteinMembraneComponent(GufeTokenizableTestsMixin):
+    cls = ProteinMembraneComponent
+    # key = "ProteinComponent-089f72c9fa2c9c18d53308038eeab5c9"
+    # repr = "ProteinComponent(name=Steve)"
+
+    @pytest.fixture
+    def instance(self, PDB_181L_path):
+        return self.cls.from_pdb_file(PDB_181L_path, name="Steve")
+
+    def test_protein_box_vectors(self, PDB_181L_path):
+        m1 = self.cls.from_pdb_file(PDB_181L_path)
+        vectors = m1.periodic_box_vectors
+        assert vectors[0][0] == 13.4081
 
 def test_no_monomer_info_error(ethane):
     with pytest.raises(TypeError):
